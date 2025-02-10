@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'yt_dlp',
     'corsheaders',
+    'channels',
 
 ]
 
@@ -83,6 +84,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'youtube_downloader.wsgi.application'
 
+ASGI_APPLICATION = 'youtube_downloader.asgi.application'
+
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -92,6 +95,13 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
+}
+
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
 }
 
 
