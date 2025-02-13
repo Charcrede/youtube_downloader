@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'yt_dlp',
     'corsheaders',
     'channels',
+    'selenium',
 
 ]
 
