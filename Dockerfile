@@ -33,7 +33,7 @@ RUN chmod +x /app/chromedriver
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Exposer le port
-EXPOSE 8000
+EXPOSE 8080
 
 # Lancer l'application Django avec Gunicorn
 CMD ["gunicorn", "youtube_downloader.wsgi:application", "--bind", "0.0.0.0:8000"]
