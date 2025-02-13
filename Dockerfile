@@ -8,7 +8,7 @@ RUN apk add --no-cache python3 py3-pip
 # Installer Google Chrome
 RUN apt update && apt install -y wget
 RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add -
-RUN echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb
+RUN echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb"
 
 
 
