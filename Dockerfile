@@ -4,6 +4,14 @@ FROM jrottenberg/ffmpeg:4.4-alpine
 # Installer les dépendances système
 RUN apk add --no-cache python3 py3-pip
 
+# Installer les dépendances nécessaires pour Chrome et ChromeDriver
+RUN apt-get update && apt-get install -y wget unzip curl \
+    && wget -O /usr/bin/chromedriver https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.98/linux64/chromedriver-linux64.zip \
+    && unzip /usr/bin/chromedriver -d /usr/bin/ \
+    && chmod +x /usr/bin/chromedriver \
+    && wget -O /usr/bin/google-chrome https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
+    && dpkg -i /usr/bin/google-chrome || apt-get install -fy
+
 # Définir le répertoire de travail
 WORKDIR /app
 
@@ -18,3 +26,5 @@ EXPOSE 8000
 
 # Lancer l'application Django avec Gunicorn
 CMD ["gunicorn", "youtube_downloader.wsgi:application", "--bind", "0.0.0.0:8000"]
+
+

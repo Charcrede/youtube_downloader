@@ -15,6 +15,20 @@ from django.conf import settings
 from channels.layers import get_channel_layer
 import asyncio
 
+def check_and_get_cookies():
+    """Vérifie si le fichier cookies.json existe, sinon le crée en exécutant get_cookies.py"""
+    cookies_file = "cookies.json"
+    
+    if not os.path.exists(cookies_file):
+        # Si le fichier de cookies n'existe pas, lance le script get_cookies.py
+        print("Cookies non trouvés, récupération des cookies...")
+        subprocess.run(["python", "get_cookies.py"])
+        
+        # Vérifie à nouveau si le fichier de cookies existe après exécution du script
+        if not os.path.exists(cookies_file):
+            raise FileNotFoundError("Le fichier de cookies n'a pas pu être créé.")
+        print("Cookies récupérés avec succès.")
+
 # Fonction pour récupérer les flux vidéo disponibles
 @api_view(['POST'])
 def get_video_info(request):
@@ -25,7 +39,22 @@ def get_video_info(request):
         return Response({"error": "URL manquante"}, status=400)
 
     try:
-        ydl_opts = {"quiet": True}
+        check_and_get_cookies()  # Lancer le script pour récupérer les cookies si nécessaire
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
+    cookies_file = "cookies.json"
+    
+    # Vérifier l'existence du fichier de cookies
+    if not os.path.exists(cookies_file):
+        return Response({"error": "Le fichier de cookies est introuvable"}, status=500)
+
+    try:
+        ydl_opts = {
+            "quiet": True,
+            "cookies": cookies_file  # Charger les cookies depuis le fichier
+        }
+        
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(video_url, download=False)
 
@@ -34,7 +63,7 @@ def get_video_info(request):
         for format in info["formats"]:
             formats.append({
                 "format_id": format.get("format_id"),
-                "resolution": format.get("format"),
+                "resolution": f"{format.get('height', 'Inconnu')}p",  # Récupère la résolution si elle existe
                 "filesize": format.get("filesize", "Inconnu"),
                 "has_audio": format.get("acodec") != "none",  # Vérifier si l'audio est présent
                 "has_video": format.get("vcodec") != "none"
@@ -51,7 +80,7 @@ def get_video_info(request):
 
 @api_view(['POST'])
 def download_video(request, output_path="downloads/"):
-    """Télécharge la vidéo en fonction de la résolution et fusionne si nécessaire"""
+    """Télécharge la vidéo avec la résolution sélectionnée et fusionne si nécessaire"""
     video_url = request.data.get("url")
     format_id = request.data.get("format_id")
 
@@ -59,11 +88,20 @@ def download_video(request, output_path="downloads/"):
         return Response({"error": "URL ou format manquant"}, status=400)
 
     try:
+        check_and_get_cookies()  # Lancer le script pour récupérer les cookies si nécessaire
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
+    # Vérifier l'existence du fichier de cookies
+    cookies_file = "cookies.json"
+    if not os.path.exists(cookies_file):
+        return Response({"error": "Le fichier de cookies est introuvable"}, status=500)
+
+    try:
         temp_dir = tempfile.mkdtemp()
 
         # Vérifier si la vidéo sélectionnée contient déjà l’audio
-        ydl_check_opts = {"quiet": True}
-        with yt_dlp.YoutubeDL(ydl_check_opts) as ydl:
+        with yt_dlp.YoutubeDL({"quiet": True}) as ydl:
             info = ydl.extract_info(video_url, download=False)
         
         selected_format = next((f for f in info["formats"] if f["format_id"] == format_id), None)
@@ -73,19 +111,17 @@ def download_video(request, output_path="downloads/"):
 
         has_audio = selected_format.get("acodec") != "none"
 
-        # Options de téléchargement (avec ou sans fusion)
+        # Options de téléchargement
         ydl_opts = {
             "outtmpl": os.path.join(temp_dir, "%(title)s.%(ext)s"),
             "quiet": True,
-            'progress_hooks': [progress_hook],  # Ajout du hook pour suivre la progression
-            'ffmpeg_location': 'C:/Program Files/ffmpeg-7.1-essentials_build/bin'
+            "ffmpeg_location": "C:/Program Files/ffmpeg-7.1-essentials_build/bin",
+            "cookies": cookies_file  # Ajout des cookies ici
         }
 
         if has_audio:
-            # Télécharger directement la vidéo avec son
             ydl_opts["format"] = format_id
         else:
-            # Télécharger vidéo + audio séparément et fusionner
             ydl_opts["format"] = f"{format_id}+bestaudio"
             ydl_opts["merge_output_format"] = "mp4"
 
@@ -97,6 +133,7 @@ def download_video(request, output_path="downloads/"):
 
     except Exception as e:
         return Response({"error": str(e)}, status=500)
+
 
 # Hook pour envoyer la progression du téléchargement via WebSocket
 def progress_hook(d):
