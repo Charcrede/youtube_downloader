@@ -28,15 +28,15 @@ SECRET_KEY = 'django-insecure-6gumx^@nrfk2nat7k6caemw7@)_ifp-n1jrqt_g41#hegij-ic
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['youthful-kizzie-gool-b1c1af74.koyeb.app', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['youthful-kizzie-gool-b1c1af74.koyeb.app', 'localhost', '127.0.0.1','ytdownloader-dun.vercel.app']
 
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # Exemple : votre front-end Next.js
-    "https://example.com",
-    "http://localhost:3000/"    # Ajoutez ici les domaines autorisés
+    "http://localhost:3000/",
+    "https://ytdownloader-dun.vercel.app/"
 ]
 
 # Application definition
