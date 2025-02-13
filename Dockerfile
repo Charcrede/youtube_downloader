@@ -22,8 +22,12 @@ RUN apt-get update && apt-get install -y google-chrome-stable=${CHROME_VERSION} 
 # Définir le répertoire de travail
 WORKDIR /app
 
-# Copier les fichiers du projet
-COPY . .
+# Copier les fichiers du projet dans l'image Docker
+COPY . /app
+
+# Copier le chromedriver dans l'image Docker et lui donner les permissions d'exécution
+COPY chromedriver /app/chromedriver
+RUN chmod +x /app/chromedriver
 
 # Installer les dépendances Python
 RUN pip install --no-cache-dir -r requirements.txt
