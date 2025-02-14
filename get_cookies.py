@@ -14,7 +14,7 @@ def get_youtube_cookies():
     chrome_options.add_argument("--remote-debugging-port=9222")
 
     # Chemin du chromedriver
-    chromedriver_path = os.path.join(os.getcwd(), "chromedriver")
+    chromedriver_path = os.path.join(os.getcwd(), "chromedriver.exe")
 
     # Donner les permissions d'exécution au chromedriver
     os.chmod(chromedriver_path, 0o755)
