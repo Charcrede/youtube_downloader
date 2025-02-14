@@ -19,6 +19,12 @@ ARG CHROME_VERSION="133.0.6943.99"
 
 RUN apt-get update && apt-get install -y google-chrome-stable=${CHROME_VERSION} && rm -rf /var/lib/apt/lists/*
 
+wget -O chromedriver.zip "https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chromedriver-linux64.zip"
+unzip chromedriver.zip
+mv chromedriver-linux64/chromedriver /workspace/chromedriver  # Déplace le fichier au bon endroit
+chmod +x /workspace/chromedriver  # Rendre exécutable
+
+
 # Définir le répertoire de travail
 WORKDIR /app
 
