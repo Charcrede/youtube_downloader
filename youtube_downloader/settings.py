@@ -35,7 +35,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # Exemple : votre front-end Next.js
-    # "https://ytdownloader-dun.vercel.app/"
+    "https://ytdownloader-dun.vercel.app/",
+    "https://youextractor.netlify.app/",
 ]
 
 # Application definition
