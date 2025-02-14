@@ -13,7 +13,14 @@ def get_youtube_cookies():
     chrome_options.add_argument("--disable-gpu")  # Désactive le rendu GPU
     chrome_options.add_argument("--remote-debugging-port=9222")
 
-    service = Service(os.path.join(os.getcwd(), "chromedriver.exe"))  # Chemin du driver
+    # Chemin du chromedriver
+    chromedriver_path = os.path.join(os.getcwd(), "chromedriver.exe")
+
+    # Donner les permissions d'exécution au chromedriver
+    os.chmod(chromedriver_path, 0o755)
+
+    # Lancer Chrome avec le driver
+    service = Service(chromedriver_path)
     driver = webdriver.Chrome(service=service, options=chrome_options)
 
     driver.get("https://www.youtube.com")
